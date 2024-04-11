@@ -1,3 +1,23 @@
 <h1>Welcome!</h1>
 <%= link_to "sign up", new_user_registration_path %>
 <%= link_to "edit profile", edit_user_registration_path %>
+
+
+<% if current_user %>
+  <h1>Welcome <%= current_user.username %></h1>
+  <p>Full Name: <%= current_user.first_name %> <%= current_user.last_name %></p>
+  <p>Location: <%= current_user.location %></p>
+  <p>Bio: <%= current_user.bio %></p>
+
+  <%= link_to "edit profile", edit_user_registration_path %>
+  <%= link_to "Log out", destroy_user_session_path, method: :delete %>
+
+
+<% else %>
+  <h1>Hello!</h1>
+  <h2>Please log in or sign up</h2>
+
+  <%= link_to "log in", new_user_session_path %>
+  <%= link_to "sign up", new_user_registration_path %>
+
+<% end %>
