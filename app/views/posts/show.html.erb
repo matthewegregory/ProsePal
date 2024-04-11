@@ -1,0 +1,9 @@
+<h1><%= @post.title %></h1>
+<p>Created <%= time_ago_in_words(@post.created_at) %> ago...</p>
+<p>By <%= link_to @post.user.username, user_path(@post.user) %></p>
+<p><%= @post.text %></p>
+<p>Last updated <%= @post.updated_at.strftime("%d %B %Y, %H:%M") %></p>
+
+
+<%= link_to "Edit", edit_post_path(@post) if user_signed_in? && @post.user == current_user %>
+

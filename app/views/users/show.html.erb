@@ -1,0 +1,18 @@
+<div>
+
+  <h1><%= @user.username %></h1>
+  <h2><%= @user.first_name %> <%= @user.last_name %></h2>
+  <p>Number of posts: XX</p>
+  <p><%= @user.location %> <%= @user.birthdate %></p>
+  <p><a href="mailto:<%= @user.email %>"><%= @user.email %></a></p>
+  <p><%= @user.bio %></p>
+
+  <%= link_to "all users", users_path  %>
+  <div>
+    <% if @user == current_user %>
+      <%= link_to "edit profile", edit_user_registration_path %>
+      <%= link_to "log out", destroy_user_session_path, method: :delete %>
+    <% end %>
+  </div>
+
+</div>

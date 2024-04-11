@@ -1,0 +1,10 @@
+<h1>My posts!</h1>
+
+<% @posts.each do |post| %>
+  <div>
+    <h2><%= link_to post.title, post %></h2>
+    <p><%= truncate(post.text, length: 20) %></p>
+    <p>Created <%= post.created_at.strftime("%d %B %Y, %H:%M") %></p>
+    <p>Last updated <%= post.updated_at.strftime("%d %B %Y, %H:%M") %></p>
+  </div>
+<% end %>
