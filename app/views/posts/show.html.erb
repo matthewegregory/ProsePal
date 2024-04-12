@@ -3,7 +3,17 @@
 <p>By <%= link_to @post.user.username, user_path(@post.user) %></p>
 <p><%= @post.text %></p>
 <p>Last updated <%= @post.updated_at.strftime("%d %B %Y, %H:%M") %></p>
+<div>
+  <% if current_user && @post.likes.exists?(user_id: current_user.id) %>
+    <p>You have already liked this post.</p>
+  <% else %>
+    <%= form_with model: @like, url: user_post_likes_path(@post.user, @post) do |form| %>
+      <%= form.submit 'Like post', class: 'submit' %>
+    <% end %>
+  <% end %>
+  <p>Likes: <%= @post.likes_counter || 0 %> </p>
+</div>
 
-
-<%= link_to "Edit", edit_post_path(@post) if user_signed_in? && @post.user == current_user %>
-
+<% if user_signed_in? && @post.user == current_user %>
+  <%= link_to "edit post", edit_user_post_path(@post.user, @post) %>
+<% end %>

@@ -2,4 +2,4 @@
 
 <%= render partial: "form", locals: {post: @post} %>
 
-<%= button_to "delete post", @post, method: :delete, data: {turbo_confirm: "Are you sure?"} %>
+<%= button_to "delete post", user_post_path(user_id: @post.user_id, id: @post.id), method: :delete, data: { turbo_confirm: "Are you sure?" } %>

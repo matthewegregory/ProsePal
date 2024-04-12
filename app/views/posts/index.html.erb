@@ -2,7 +2,7 @@
 
 <% @posts.each do |post| %>
   <div>
-    <h2><%= link_to post.title, post %></h2>
+    <h2><%= link_to post.title, user_post_path(post.user, post) %></h2>
     <p>by <%= link_to post.user.username, user_path(post.user) %></p>
     <p><%= truncate(post.text, length: 20) %></p>
     <p>Created <%= time_ago_in_words(post.created_at) %> ago...</p>

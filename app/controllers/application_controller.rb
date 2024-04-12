@@ -3,6 +3,7 @@ class ApplicationController < ActionController::Base
 
   def home
     @user = current_user
+    puts current_user.inspect
     render 'layouts/home'
   end
 

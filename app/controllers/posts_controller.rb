@@ -7,6 +7,7 @@ class PostsController < ApplicationController
   end
 
   def show
+    @user = @post.user
   end
 
   def new
@@ -32,7 +33,7 @@ class PostsController < ApplicationController
 
   def update
     if @post.update(post_params)
-      redirect_to @post
+      redirect_to user_post_path(@post.user, @post)
     else
       render :edit, status: :unprocessable_entity
     end
@@ -40,11 +41,12 @@ class PostsController < ApplicationController
 
   def destroy
     @post.destroy
-    redirect_to posts_path
+    redirect_to user_posts_path(user_id: @post.user_id)
   end
 
   def my_posts
-    @posts = current_user.posts
+    @user = current_user
+    @posts = @user.posts
   end
 
   private
