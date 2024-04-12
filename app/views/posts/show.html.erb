@@ -5,13 +5,36 @@
 <p>Last updated <%= @post.updated_at.strftime("%d %B %Y, %H:%M") %></p>
 <div>
   <% if current_user && @post.likes.exists?(user_id: current_user.id) %>
-    <p>You have already liked this post.</p>
+    <p>You liked this post.</p>
   <% else %>
     <%= form_with model: @like, url: user_post_likes_path(@post.user, @post) do |form| %>
       <%= form.submit 'Like post', class: 'submit' %>
     <% end %>
   <% end %>
   <p>Likes: <%= @post.likes_counter || 0 %> </p>
+</div>
+<div>
+
+<%= form_with model: @comment, url: user_post_comments_path(@post.user, @post) do |form| %>
+  <div>
+    <%= form.label :text, class: "form-label" %>
+    <%= form.text_field :text, required: true, autofocus: true, placeholder: 'Leave a comment', class: "form-input" %>
+  </div>
+  <%= hidden_field_tag :comment, 'value' %>
+  <%= form.submit "Comment", class: "form-button" %>
+<% end %>
+
+  <ul>
+    <h3>Comments:</h3>
+    <% if @comments.present? %>
+      <% @comments.each do |comment| %>
+        <li><%= comment.user.username %>, <%= comment.created_at.strftime("%d %B %Y, %H:%M") %>: <%= comment.text %></li>
+      <% end %>
+    <% else %>
+      <li>No comments yet.</li>
+    <% end %>
+  </ul>
+
 </div>
 
 <% if user_signed_in? && @post.user == current_user %>
