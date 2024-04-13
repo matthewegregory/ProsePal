@@ -1,4 +1,4 @@
-<%= form_with(model: post, url: user_post_path(@post.user, @post), method: :patch) do |form| %>
+<%= form_with(model: post, url: user_posts_path(@post.user), method: :post) do |form| %>
   <% if form.object.errors.any? %>
     <div>
       <% form.object.errors.full_messages.each do |message| %>

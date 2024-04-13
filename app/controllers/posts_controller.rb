@@ -8,17 +8,19 @@ class PostsController < ApplicationController
 
   def show
     @user = @post.user
+    @like = Like.new
     @comments = @post.comments
   end
 
   def new
-    @post = Post.new
+    @user = User.find(params[:user_id])
+    @post = @user.posts.build
   end
 
   def create
     @post = current_user.posts.new(post_params)
     if @post.save
-      redirect_to @post
+      redirect_to user_posts_path(@post) # Redirect to the show page of the newly created post
     else
       render :new, status: :unprocessable_entity
     end

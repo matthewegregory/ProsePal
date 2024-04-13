@@ -16,7 +16,9 @@ class CommentsController < ApplicationController
       @comment.update_comments_counter
       redirect_to user_post_path(@user.id, @post.id), notice: 'Comment created successfully!'
     else
-      redirect_to user_post_path(@user.id, @post.id), notice: 'Sorry! Something went wrong!'
+      # If the comment fails to save due to validation errors,
+      # render the new action again with the errors displayed to the user
+      render :new
     end
   end
 

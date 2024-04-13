@@ -1,6 +1,6 @@
 class Post < ApplicationRecord
   belongs_to :user
-  has_many :likes
+  has_many :likes, as: :likeable, dependent: :destroy
   has_many :comments
 
   def increment_likes_counter

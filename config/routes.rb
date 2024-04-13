@@ -10,7 +10,9 @@ Rails.application.routes.draw do
     resources :posts do
       get 'edit', on: :member
       resources :likes, only: [:create]
-      resources :comments
+      resources :comments do
+        resources :likes, only: [:create, :destroy]
+      end
     end
   end
 

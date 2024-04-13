@@ -3,40 +3,55 @@
 <p>By <%= link_to @post.user.username, user_path(@post.user) %></p>
 <p><%= @post.text %></p>
 <p>Last updated <%= @post.updated_at.strftime("%d %B %Y, %H:%M") %></p>
-<div>
-  <% if current_user && @post.likes.exists?(user_id: current_user.id) %>
-    <p>You liked this post.</p>
-  <% else %>
-    <%= form_with model: @like, url: user_post_likes_path(@post.user, @post) do |form| %>
-      <%= form.submit 'Like post', class: 'submit' %>
-    <% end %>
-  <% end %>
-  <p>Likes: <%= @post.likes_counter || 0 %> </p>
-</div>
-<div>
 
-<%= form_with model: @comment, url: user_post_comments_path(@post.user, @post) do |form| %>
-  <div>
-    <%= form.label :text, class: "form-label" %>
-    <%= form.text_field :text, required: true, autofocus: true, placeholder: 'Leave a comment', class: "form-input" %>
-  </div>
-  <%= hidden_field_tag :comment, 'value' %>
-  <%= form.submit "Comment", class: "form-button" %>
+<% if current_user && @post.likes.exists?(user_id: current_user.id) %>
+  <p>You already liked this post.</p>
+<% else %>
+  <%= form_with model: @like, url: user_post_likes_path(@post.user, @post) do |form| %>
+    <%= form.submit 'Like post', class: 'submit' %>
+  <% end %>
 <% end %>
 
-  <ul>
-    <h3>Comments:</h3>
-    <% if @comments.present? %>
-      <% @comments.each do |comment| %>
-        <li><%= comment.user.username %>, <%= comment.created_at.strftime("%d %B %Y, %H:%M") %>: <%= comment.text %></li>
-      <% end %>
-    <% else %>
-      <li>No comments yet.</li>
-    <% end %>
-  </ul>
 
-</div>
+<p>Likes: <%= @post.likes_counter || 0 %> </p>
+
+<% @comments.each do |comment| %>
+  <div>
+    <ul>
+      <li>
+        <%= comment.user.username %>, <%= comment.created_at.strftime("%d %B %Y, %H:%M") %>: <%= comment.text %>
+        <% if current_user && comment.likes.exists?(user_id: current_user.id) %>
+          <p>You already liked this comment.</p>
+        <% else %>
+          <%= form_with model: Like.new, url: user_post_comment_likes_path(@post.user, @post, comment), method: :post do |form| %>
+            <%= form.hidden_field :likeable_id, value: comment.id %>
+            <%= form.hidden_field :likeable_type, value: "Comment" %>
+            <%= form.submit 'Like comment', class: 'submit' %>
+          <% end %>
+        <% end %>
+        <p>Likes: <%= comment.likes_count %> </p>
+      </li>
+    </ul>
+  </div>
+<% end %>
 
 <% if user_signed_in? && @post.user == current_user %>
   <%= link_to "edit post", edit_user_post_path(@post.user, @post) %>
+<% end %>
+
+<% if @like.errors.any? %>
+  <div class="error-messages">
+    <h2>Failed to like:</h2>
+    <ul>
+      <% @like.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<!-- Form for creating a new comment -->
+<%= form_with(model: Comment.new, url: user_post_comments_path(@post.user, @post)) do |form| %>
+  <%= form.text_area :text, placeholder: "Enter your comment here..." %>
+  <%= form.submit "Post Comment" %>
 <% end %>
