@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_04_12_144321) do
+ActiveRecord::Schema[7.1].define(version: 2024_04_15_141033) do
   create_table "comments", force: :cascade do |t|
     t.text "text"
     t.integer "user_id", null: false
@@ -49,6 +49,19 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_12_144321) do
     t.index ["user_id"], name: "index_posts_on_user_id"
   end
 
+  create_table "posts_tags", id: false, force: :cascade do |t|
+    t.integer "post_id", null: false
+    t.integer "tag_id", null: false
+    t.index ["post_id", "tag_id"], name: "index_posts_tags_on_post_id_and_tag_id"
+    t.index ["tag_id", "post_id"], name: "index_posts_tags_on_tag_id_and_post_id"
+  end
+
+  create_table "tags", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -72,4 +85,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_12_144321) do
   add_foreign_key "likes", "posts"
   add_foreign_key "likes", "users"
   add_foreign_key "posts", "users"
+  add_foreign_key "posts_tags", "posts"
+  add_foreign_key "posts_tags", "tags"
 end

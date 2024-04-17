@@ -1,5 +1,6 @@
 class CommentsController < ApplicationController
-  before_action :authenticate_user!
+  include Rails.application.routes.url_helpers
+  before_action :authenticate_user!, only: [:create]
 
   def new
     @user = User.find_by(id: params[:user_id])
@@ -8,17 +9,16 @@ class CommentsController < ApplicationController
   end
 
   def create
-    @user = current_user
-    @post = Post.find_by(id: params[:post_id])
-    @comment = Comment.new(post_id: params[:post_id], user_id: current_user.id, text: comment_params[:text])
+    @post = Post.find(params[:post_id])
+    @comment = @post.comments.build(comment_params)
+    @comment.user = current_user
 
     if @comment.save
-      @comment.update_comments_counter
-      redirect_to user_post_path(@user.id, @post.id), notice: 'Comment created successfully!'
+      redirect_to @post, notice: 'Comment was successfully created.'
     else
-      # If the comment fails to save due to validation errors,
-      # render the new action again with the errors displayed to the user
-      render :new
+      # Handle validation errors
+      @comments = @post.comments.reload
+      render 'posts/show'
     end
   end
 
@@ -26,6 +26,6 @@ class CommentsController < ApplicationController
   private
 
   def comment_params
-    params.permit(:text, :comment)
+    params.require(:comment).permit(:text)
   end
 end

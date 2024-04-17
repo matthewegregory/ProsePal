@@ -1,28 +1,36 @@
 class PostsController < ApplicationController
+  before_action :set_user, except: [:index]
   before_action :set_post, except: [:index, :new, :create, :my_posts]
   before_action :authenticate_user!, except: [:index, :show]
+  # skip_after_action :turbostream
 
   def index
     @posts = Post.order(created_at: :desc)
   end
 
   def show
-    @user = @post.user
-    @like = Like.new
+    @like = current_user.likes.find_by(post_id: @post.id) || Like.new
     @comments = @post.comments
+    @new_comment = @post.comments.new
+    @post_comments = @post.comments.includes(:user)
   end
 
   def new
-    @user = User.find(params[:user_id])
-    @post = @user.posts.build
+    @post = Post.new
+    @post.tags.build
   end
 
   def create
-    @post = current_user.posts.new(post_params)
+    @post = Post.new(post_params)
+    @post.user = current_user
+    # Parse the tag_list manually before saving
+    tag_list = params[:post][:tag_list].split(",").map(&:strip)
+    @post.tag_list = tag_list
+
     if @post.save
-      redirect_to user_posts_path(@post) # Redirect to the show page of the newly created post
+      redirect_to @post, notice: 'Post was successfully created.'
     else
-      render :new, status: :unprocessable_entity
+      render :new
     end
   end
 
@@ -36,7 +44,7 @@ class PostsController < ApplicationController
 
   def update
     if @post.update(post_params)
-      redirect_to user_post_path(@post.user, @post)
+      redirect_to post_path(@post)
     else
       render :edit, status: :unprocessable_entity
     end
@@ -44,23 +52,34 @@ class PostsController < ApplicationController
 
   def destroy
     @post.destroy
-    redirect_to user_posts_path(user_id: @post.user_id)
+    redirect_to user_posts_path(@user)
   end
 
   def my_posts
-    @user = current_user
-    @posts = @user.posts
+    @posts = current_user.posts.order(created_at: :desc)
   end
 
   private
 
-  def post_params
-    params.require(:post).permit(:title, :text)
+  def set_user
+    @user = params[:user_id] ? User.find(params[:user_id]) : current_user
   end
 
   def set_post
     @post = Post.find(params[:id])
   rescue ActiveRecord::RecordNotFound
-    redirect_to root_path, alert: "That doen't exist."
+    flash[:alert] = "The post you're looking for doesn't exist."
+    redirect_to posts_path # Redirect to the index page for posts
+  end
+
+  def post_params
+    params.require(:post).permit(:title, :text, :tag_list)
+  end
+
+  def authenticate_user!
+    unless user_signed_in?
+      flash[:alert] = "You must be signed in to perform this action."
+      redirect_to new_user_session_path
+    end
   end
 end

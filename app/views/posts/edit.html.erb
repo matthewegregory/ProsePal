@@ -1,14 +1,4 @@
 <h1>Edit post</h1>
 
-<%= form_with(model: @post, url: user_post_path(@post.user, @post), method: :patch) do |form| %>
-  <div>
-    <%= form.label :title, class: "form-label" %>
-    <%= form.text_field :title, required: true, class: "form-input" %>
-  </div>
-  <div>
-    <%= form.label :text, class: "form-label" %>
-    <%= form.text_area :text, required: true, class: "form-input" %>
-  </div>
-  <%= form.submit "Update Post", class: "form-button" %>
-<% end %>
-<%= button_to "delete post", user_post_path(user_id: @post.user_id, id: @post.id), method: :delete, data: { turbo_confirm: "Are you sure?" } %>
+<%= render partial: 'form', locals: { user: @user, post: @post } %>
+<%= button_to "delete post", post_path(@post), method: :delete, data: { turbo_confirm: "Are you sure?" } %>

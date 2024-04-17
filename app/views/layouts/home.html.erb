@@ -10,9 +10,10 @@
 
   <%= link_to "edit profile", edit_user_registration_path %>
   <%= link_to "log out", destroy_user_session_path, method: :delete %>
-  <%= link_to "new post", new_user_post_path(current_user) %>
+  <%= link_to "new post", new_post_path %>
   <%= link_to "my posts", my_posts_path %>
-  <%= link_to "all posts", user_posts_path(user_id: @user.id) %>
+  <%= link_to "all posts", posts_path %>
   <%= link_to "all users", users_path %>
+  <%= link_to "all tags", tags_path %>
 
 <% end %>

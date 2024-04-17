@@ -1,57 +1,56 @@
+<% if flash[:alert].present? %>
+  <div class="alert alert-danger">
+    <%= flash[:alert] %>
+  </div>
+<% end %>
+
 <h1><%= @post.title %></h1>
-<p>Created <%= time_ago_in_words(@post.created_at) %> ago...</p>
+<p>
+  <% if @post.created_at.present? %>
+    Created <%= time_ago_in_words(@post.created_at) %> ago...
+  <% else %>
+    Created recently...
+  <% end %>
+</p>
 <p>By <%= link_to @post.user.username, user_path(@post.user) %></p>
 <p><%= @post.text %></p>
+<p>
+  Tags:
+  <% @post.tags.each do |tag| %>
+    <%= link_to tag.name, tag_path(tag) %>
+  <% end %>
+</p>
+
 <p>Last updated <%= @post.updated_at.strftime("%d %B %Y, %H:%M") %></p>
 
-<% if current_user && @post.likes.exists?(user_id: current_user.id) %>
-  <p>You already liked this post.</p>
+<% if @like.persisted? %>
+  <p>You liked this post.</p>
 <% else %>
-  <%= form_with model: @like, url: user_post_likes_path(@post.user, @post) do |form| %>
+  <%= form_with model: @like, url: post_like_post_path(@post), method: :post do |form| %>
     <%= form.submit 'Like post', class: 'submit' %>
   <% end %>
 <% end %>
 
-
 <p>Likes: <%= @post.likes_counter || 0 %> </p>
+<p>Comments: <%= @post.comments_counter || 0 %> </p>
 
-<% @comments.each do |comment| %>
-  <div>
-    <ul>
+<% if @post_comments.any? %>
+  <ul>
+    <% @post_comments.each do |comment| %>
       <li>
-        <%= comment.user.username %>, <%= comment.created_at.strftime("%d %B %Y, %H:%M") %>: <%= comment.text %>
-        <% if current_user && comment.likes.exists?(user_id: current_user.id) %>
-          <p>You already liked this comment.</p>
-        <% else %>
-          <%= form_with model: Like.new, url: user_post_comment_likes_path(@post.user, @post, comment), method: :post do |form| %>
-            <%= form.hidden_field :likeable_id, value: comment.id %>
-            <%= form.hidden_field :likeable_type, value: "Comment" %>
-            <%= form.submit 'Like comment', class: 'submit' %>
-          <% end %>
-        <% end %>
-        <p>Likes: <%= comment.likes_count %> </p>
+        <%= comment.user&.username %> <%= comment.created_at&.strftime("%d %B %Y, %H:%M") %>: <%= comment.text %>
       </li>
-    </ul>
-  </div>
+    <% end %>
+  </ul>
+<% else %>
+  <p>There are no comments... yet</p>
+<% end %>
+
+<%= form_with(model: @new_comment, url: post_comments_path(@post)) do |form| %>
+  <%= form.text_area :text, placeholder: "Enter your comment here..." %>
+  <%= form.submit "Post Comment" %>
 <% end %>
 
 <% if user_signed_in? && @post.user == current_user %>
-  <%= link_to "edit post", edit_user_post_path(@post.user, @post) %>
-<% end %>
-
-<% if @like.errors.any? %>
-  <div class="error-messages">
-    <h2>Failed to like:</h2>
-    <ul>
-      <% @like.errors.full_messages.each do |message| %>
-        <li><%= message %></li>
-      <% end %>
-    </ul>
-  </div>
-<% end %>
-
-<!-- Form for creating a new comment -->
-<%= form_with(model: Comment.new, url: user_post_comments_path(@post.user, @post)) do |form| %>
-  <%= form.text_area :text, placeholder: "Enter your comment here..." %>
-  <%= form.submit "Post Comment" %>
+  <%= link_to "edit post", edit_post_path(@post) %>
 <% end %>

@@ -2,9 +2,30 @@
 
 <% @posts.each do |post| %>
   <div>
-    <h2><%= link_to post.title, user_post_path(post.user, post) %></h2>
+    <h2><%= link_to post.title, post_path(post) %></h2>
     <p>by <%= link_to post.user.username, user_path(post.user) %></p>
     <p><%= truncate(post.text, length: 20) %></p>
     <p>Created <%= time_ago_in_words(post.created_at) %> ago...</p>
   </div>
 <% end %>
+
+<!-- Define a Turbo Stream to handle updates -->
+<turbo-stream action="append" target="posts-container">
+  <template>
+    <%# Pass the post as a parameter to the template %>
+    <%# This template will be used to append new posts to the list %>
+    <%# Use post as the local variable in the loop %>
+    <% @posts.each do |post| %>
+      <div>
+        <h2><%= link_to post.title, post_path(post) %></h2>
+        <p>by <%= link_to post.user.username, user_path(post.user) %></p>
+        <p><%= truncate(post.text, length: 20) %></p>
+        <p>Created <%= time_ago_in_words(post.created_at) %> ago...</p>
+      </div>
+    <% end %>
+  </template>
+</turbo-stream>
+
+<div id="posts-container" data-controller="posts">
+  <turbo-frame id="new-post-frame" src="/posts"></turbo-frame>
+</div>

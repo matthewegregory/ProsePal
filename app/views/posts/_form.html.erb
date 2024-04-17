@@ -1,7 +1,8 @@
-<%= form_with(model: post, url: user_posts_path(@post.user), method: :post) do |form| %>
-  <% if form.object.errors.any? %>
+<%= form_for @post, html: {multipart: true, data: { turbo: false }} do |form| %>
+
+  <% if @post.errors.any? %>
     <div>
-      <% form.object.errors.full_messages.each do |message| %>
+      <% @post.errors.full_messages.each do |message| %>
         <div><%= message %></div>
       <% end %>
     </div>
@@ -17,6 +18,11 @@
     <%= form.text_area :text %>
   </div>
 
-  <%= form.button %>
+<div>
+  <%= form.label :tag_list, "Tags (comma-separated)" %>
+  <%= form.text_field :tag_list, value: @post.tags&.pluck(:name)&.join(', ') %>
+</div>
 
+
+  <%= form.submit %>
 <% end %>
