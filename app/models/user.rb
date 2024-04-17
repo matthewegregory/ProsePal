@@ -9,4 +9,8 @@ class User < ApplicationRecord
 
   validates :username, uniqueness: true, length: { in: 5..18 }
   validates :bio, length: { in: 20..200 }
+
+  def self.search(query)
+    where("username LIKE ? OR first_name LIKE ? OR last_name LIKE ?", "%#{query}%", "%#{query}%", "%#{query}%")
+  end
 end

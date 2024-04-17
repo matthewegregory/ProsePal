@@ -14,6 +14,10 @@ class Post < ApplicationRecord
   validates :text, length: { in: 10..500 }
   validates :title, length: { in: 5..30 }
 
+  def self.search(query)
+    joins(:tags, :comments).where("posts.title LIKE ? OR posts.text LIKE ? OR tags.name LIKE ? OR comments.text LIKE ?", "%#{query}%", "%#{query}%", "%#{query}%", "%#{query}%").distinct
+  end
+
   def increment_likes_counter
     self.likes_counter += 1
     save

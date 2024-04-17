@@ -3,3 +3,4 @@ import "@hotwired/turbo-rails"
 import "./controllers";
 import { application } from "./application";
 import * as bootstrap from "bootstrap"
+import 'bootstrap/dist/js/bootstrap.bundle';
